@@ -87,7 +87,7 @@ function MyInputField({
             id={name}
             type="checkbox"
             name={name}
-            checked={!!value}
+            checked={!!(checked ?? value)}
             onChange={onChange}
             className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
             {...rest}

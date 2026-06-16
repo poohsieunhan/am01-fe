@@ -23,8 +23,7 @@ import {
   selectCompanySearchText,
 } from "../features/company/companySelectors";
 
-// UI hook (Redux version)
-import { useCompanyForm } from "../hooks/company/userCompanyForm";
+import { useCompanyForm } from "../hooks/company/useCompanyForm";
 
 function CompanyListPage() {
   const dispatch = useDispatch();
@@ -51,10 +50,8 @@ function CompanyListPage() {
     handleSubmit,
   } = useCompanyForm();
 
-  const page = pagination?.page || 1;
   const limit = pagination?.limit || 10;
 
-  // initial fetch (tương đương useCompanies(1,10) trước đây)
   useEffect(() => {
     dispatch(fetchCompanies({ page: 1, limit: 10 }));
   }, [dispatch]);

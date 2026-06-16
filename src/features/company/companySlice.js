@@ -2,10 +2,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import toast from "react-hot-toast";
 import companyApi from "../../services/companyApi";
 
-/**
- * GET list companies (server pagination)
- * Tương đương fetchCompanies trong useCompanies :contentReference[oaicite:7]{index=7}
- */
+// GET list companies with server pagination.
 export const fetchCompanies = createAsyncThunk(
   "company/fetchCompanies",
   async ({ page = 1, limit = 10 } = {}, { rejectWithValue }) => {

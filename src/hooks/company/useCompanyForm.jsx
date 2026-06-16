@@ -2,8 +2,8 @@ import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   createCompany,
-  updateCompany,
   deleteCompany,
+  updateCompany,
 } from "../../features/company/companySlice";
 import { selectCompanyPagination } from "../../features/company/companySelectors";
 
@@ -25,7 +25,7 @@ export function useCompanyForm() {
   const pagination = useSelector(selectCompanyPagination);
 
   const [open, setOpen] = useState(false);
-  const [mode, setMode] = useState("create"); // 'create' | 'edit' | 'delete'
+  const [mode, setMode] = useState("create");
   const [selectedCompany, setSelectedCompany] = useState(null);
   const [formData, setFormData] = useState(initialForm());
   const [formError, setFormError] = useState("");
@@ -85,13 +85,13 @@ export function useCompanyForm() {
           setFormError("Tên công ty là bắt buộc.");
           return;
         }
+
         if (!formData.MaSoThue.trim()) {
           setFormError("Mã số thuế là bắt buộc.");
           return;
         }
       }
 
-      // create về page 1; edit giữ page hiện tại; delete về page 1
       const refetch = {
         page: mode === "edit" ? pagination?.page || 1 : 1,
         limit: pagination?.limit || 10,
@@ -104,15 +104,13 @@ export function useCompanyForm() {
 
       if (mode === "edit" && selectedCompany) {
         await dispatch(
-          updateCompany({ id: selectedCompany.Id, payload: formData, refetch })
+          updateCompany({ id: selectedCompany.Id, payload: formData, refetch }),
         ).unwrap();
         setOpen(false);
       }
 
       if (mode === "delete" && selectedCompany) {
-        await dispatch(
-          deleteCompany({ id: selectedCompany.Id, refetch })
-        ).unwrap();
+        await dispatch(deleteCompany({ id: selectedCompany.Id, refetch })).unwrap();
         setOpen(false);
       }
     } catch (err) {

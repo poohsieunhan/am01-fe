@@ -47,7 +47,7 @@ export default function CompanyToolbar({
       //toast.success("Import thành công");
       clearFile();
       setExcelOpen(false);
-    } catch (err) {
+    } catch {
       toast.error("Import thất bại");
     } finally {
       setImporting(false);
@@ -58,7 +58,7 @@ export default function CompanyToolbar({
     try {
       await onDownloadTemplate();
       setExcelOpen(false);
-    } catch (err) {
+    } catch {
       toast.error("Không thể tải template");
     }
   };
