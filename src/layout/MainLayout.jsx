@@ -1,6 +1,20 @@
-import { Link, NavLink, Outlet } from "react-router-dom";
+import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
 import { useMemo, useState } from "react";
-import { House, ClipboardList, Building2, CardSim } from "lucide-react";
+import {
+  House,
+  Building2,
+  Boxes,
+  Layers,
+  FolderKanban,
+  Users,
+  MailCheck,
+  Mail,
+  BellRing,
+  Bell,
+  ChevronDown,
+  ChevronRight,
+  Settings,
+} from "lucide-react";
 
 const layoutStyle = {
   display: "flex",
@@ -24,6 +38,20 @@ const activeLinkStyle = {
 
 function MainLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const location = useLocation();
+  const isOrgActive =
+    location.pathname.startsWith("/company") ||
+    location.pathname.startsWith("/project");
+  const [orgOpen, setOrgOpen] = useState(true);
+
+  const isConfigActive =
+    location.pathname.startsWith("/assettype") ||
+    location.pathname.startsWith("/account") ||
+    location.pathname.startsWith("/emailconfig") ||
+    location.pathname.startsWith("/emailrecipient") ||
+    location.pathname.startsWith("/assettypenotification") ||
+    location.pathname.startsWith("/assetnotification");
+  const [configOpen, setConfigOpen] = useState(true);
 
   const sidebarStyle = useMemo(
     () => ({
@@ -76,53 +104,320 @@ function MainLayout() {
             gap: "8px",
           }}
         >
+          {/* Menu: Tài sản */}
           <NavLink
-            to="/requestform"
+            to="/asset"
             style={({ isActive }) => ({
               ...(isActive ? activeLinkStyle : null),
-              display: "block",
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
               padding: "8px",
               borderRadius: "8px",
               textDecoration: "none",
               color: "inherit",
               whiteSpace: "nowrap",
             })}
-            title={!sidebarOpen ? "Phiếu yêu cầu" : undefined}
+            title={!sidebarOpen ? "Tài sản" : undefined}
           >
-            {sidebarOpen ? "Phiếu yêu cầu" : <ClipboardList size={16} />}
+            <Boxes size={16} />
+            {sidebarOpen && <span style={{ fontSize: "14px" }}>Tài sản</span>}
           </NavLink>
+          {/* Menu cha: Công ty & Dự án */}
+          <div>
+            <button
+              type="button"
+              onClick={() => {
+                if (!sidebarOpen) {
+                  setSidebarOpen(true);
+                  setOrgOpen(true);
+                } else {
+                  setOrgOpen((v) => !v);
+                }
+              }}
+              style={{
+                width: "100%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: sidebarOpen ? "space-between" : "center",
+                padding: "8px",
+                borderRadius: "8px",
+                border: "none",
+                background: isOrgActive ? "#e0f2fe" : "transparent",
+                color: isOrgActive ? "#0284c7" : "inherit",
+                cursor: "pointer",
+                fontWeight: isOrgActive ? "600" : "normal",
+                textAlign: "left",
+                transition: "background-color 150ms ease",
+              }}
+              title={!sidebarOpen ? "Công ty & Dự án" : undefined}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  minWidth: 0,
+                }}
+              >
+                <Building2 size={16} />
+                {sidebarOpen && (
+                  <span style={{ fontSize: "14px", whiteSpace: "nowrap" }}>
+                    Công ty & Dự án
+                  </span>
+                )}
+              </div>
+              {sidebarOpen && (
+                <span style={{ color: "#64748b" }}>
+                  {orgOpen ? (
+                    <ChevronDown size={14} />
+                  ) : (
+                    <ChevronRight size={14} />
+                  )}
+                </span>
+              )}
+            </button>
 
-          <NavLink
-            to="/company"
-            style={({ isActive }) => ({
-              ...(isActive ? activeLinkStyle : null),
-              display: "block",
-              padding: "8px",
-              borderRadius: "8px",
-              textDecoration: "none",
-              color: "inherit",
-              whiteSpace: "nowrap",
-            })}
-            title={!sidebarOpen ? "Công ty" : undefined}
-          >
-            {sidebarOpen ? "Công ty" : <Building2 size={16} />}
-          </NavLink>
+            {/* Submenu cấp con */}
+            {sidebarOpen && orgOpen && (
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "4px",
+                  marginTop: "4px",
+                  paddingLeft: "16px",
+                  borderLeft: "2px solid #e2e8f0",
+                  marginLeft: "14px",
+                }}
+              >
+                <NavLink
+                  to="/company"
+                  style={({ isActive }) => ({
+                    ...(isActive ? activeLinkStyle : null),
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    padding: "6px 8px",
+                    borderRadius: "6px",
+                    textDecoration: "none",
+                    color: "inherit",
+                    fontSize: "13px",
+                    whiteSpace: "nowrap",
+                  })}
+                >
+                  <Building2 size={14} />
+                  <span>Công ty</span>
+                </NavLink>
 
-          <NavLink
-            to="/device"
-            style={({ isActive }) => ({
-              ...(isActive ? activeLinkStyle : null),
-              display: "block",
-              padding: "8px",
-              borderRadius: "8px",
-              textDecoration: "none",
-              color: "inherit",
-              whiteSpace: "nowrap",
-            })}
-            title={!sidebarOpen ? "Thiết bị" : undefined}
-          >
-            {sidebarOpen ? "Thiết bị" : <CardSim size={16} />}
-          </NavLink>
+                <NavLink
+                  to="/project"
+                  style={({ isActive }) => ({
+                    ...(isActive ? activeLinkStyle : null),
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    padding: "6px 8px",
+                    borderRadius: "6px",
+                    textDecoration: "none",
+                    color: "inherit",
+                    fontSize: "13px",
+                    whiteSpace: "nowrap",
+                  })}
+                >
+                  <FolderKanban size={14} />
+                  <span>Dự án</span>
+                </NavLink>
+              </div>
+            )}
+          </div>
+
+
+
+          {/* Menu cha: Cấu hình */}
+          <div>
+            <button
+              type="button"
+              onClick={() => {
+                if (!sidebarOpen) {
+                  setSidebarOpen(true);
+                  setConfigOpen(true);
+                } else {
+                  setConfigOpen((v) => !v);
+                }
+              }}
+              style={{
+                width: "100%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: sidebarOpen ? "space-between" : "center",
+                padding: "8px",
+                borderRadius: "8px",
+                border: "none",
+                background: isConfigActive ? "#e0f2fe" : "transparent",
+                color: isConfigActive ? "#0284c7" : "inherit",
+                cursor: "pointer",
+                fontWeight: isConfigActive ? "600" : "normal",
+                textAlign: "left",
+                transition: "background-color 150ms ease",
+              }}
+              title={!sidebarOpen ? "Cấu hình" : undefined}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  minWidth: 0,
+                }}
+              >
+                <Settings size={16} />
+                {sidebarOpen && (
+                  <span style={{ fontSize: "14px", whiteSpace: "nowrap" }}>
+                    Cấu hình
+                  </span>
+                )}
+              </div>
+              {sidebarOpen && (
+                <span style={{ color: "#64748b" }}>
+                  {configOpen ? (
+                    <ChevronDown size={14} />
+                  ) : (
+                    <ChevronRight size={14} />
+                  )}
+                </span>
+              )}
+            </button>
+
+            {/* Submenu cấp con của Cấu hình */}
+            {sidebarOpen && configOpen && (
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "4px",
+                  marginTop: "4px",
+                  paddingLeft: "16px",
+                  borderLeft: "2px solid #e2e8f0",
+                  marginLeft: "14px",
+                }}
+              >
+                <NavLink
+                  to="/assettype"
+                  style={({ isActive }) => ({
+                    ...(isActive ? activeLinkStyle : null),
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    padding: "6px 8px",
+                    borderRadius: "6px",
+                    textDecoration: "none",
+                    color: "inherit",
+                    fontSize: "13px",
+                    whiteSpace: "nowrap",
+                  })}
+                >
+                  <Layers size={14} />
+                  <span>Loại tài sản</span>
+                </NavLink>
+
+                <NavLink
+                  to="/account"
+                  style={({ isActive }) => ({
+                    ...(isActive ? activeLinkStyle : null),
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    padding: "6px 8px",
+                    borderRadius: "6px",
+                    textDecoration: "none",
+                    color: "inherit",
+                    fontSize: "13px",
+                    whiteSpace: "nowrap",
+                  })}
+                >
+                  <Users size={14} />
+                  <span>Tài khoản</span>
+                </NavLink>
+
+                <NavLink
+                  to="/emailconfig"
+                  style={({ isActive }) => ({
+                    ...(isActive ? activeLinkStyle : null),
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    padding: "6px 8px",
+                    borderRadius: "6px",
+                    textDecoration: "none",
+                    color: "inherit",
+                    fontSize: "13px",
+                    whiteSpace: "nowrap",
+                  })}
+                >
+                  <MailCheck size={14} />
+                  <span>Cấu hình Email</span>
+                </NavLink>
+
+                <NavLink
+                  to="/emailrecipient"
+                  style={({ isActive }) => ({
+                    ...(isActive ? activeLinkStyle : null),
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    padding: "6px 8px",
+                    borderRadius: "6px",
+                    textDecoration: "none",
+                    color: "inherit",
+                    fontSize: "13px",
+                    whiteSpace: "nowrap",
+                  })}
+                >
+                  <Mail size={14} />
+                  <span>Người nhận Email</span>
+                </NavLink>
+
+                <NavLink
+                  to="/assettypenotification"
+                  style={({ isActive }) => ({
+                    ...(isActive ? activeLinkStyle : null),
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    padding: "6px 8px",
+                    borderRadius: "6px",
+                    textDecoration: "none",
+                    color: "inherit",
+                    fontSize: "13px",
+                    whiteSpace: "nowrap",
+                  })}
+                >
+                  <BellRing size={14} />
+                  <span>Cảnh báo Loại TS</span>
+                </NavLink>
+
+                <NavLink
+                  to="/assetnotification"
+                  style={({ isActive }) => ({
+                    ...(isActive ? activeLinkStyle : null),
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    padding: "6px 8px",
+                    borderRadius: "6px",
+                    textDecoration: "none",
+                    color: "inherit",
+                    fontSize: "13px",
+                    whiteSpace: "nowrap",
+                  })}
+                >
+                  <Bell size={14} />
+                  <span>Cảnh báo Tài sản</span>
+                </NavLink>
+              </div>
+            )}
+          </div>
         </nav>
 
         {/* Footer link */}
