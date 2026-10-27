@@ -10,6 +10,7 @@ import EmailRecipientListPage from "../pages/EmailRecipientListPage";
 import AssetTypeNotificationListPage from "../pages/AssetTypeNotificationListPage";
 import AssetNotificationListPage from "../pages/AssetNotificationListPage";
 import HomePage from "../pages/HomePage";
+import DashboardPage from "../pages/DashboardPage";
 
 function AppRouter() {
   return (
@@ -17,8 +18,9 @@ function AppRouter() {
       <Routes>
         {/* Bọc tất cả trong MainLayout */}
         <Route path="/" element={<MainLayout />}>
-          {/* Mặc định vào "/" sẽ hiện danh sách Công ty */}
+          {/* Mặc định vào "/" sẽ hiện Dashboard trên HomePage */}
           <Route index element={<HomePage />} />
+          <Route path="dashboard" element={<DashboardPage />} />
           <Route path="company" element={<CompanyListPage />} />
           <Route path="asset" element={<AssetListPage />} />
           <Route path="assettype" element={<AssetTypeListPage />} />

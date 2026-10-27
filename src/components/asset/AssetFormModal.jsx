@@ -27,8 +27,8 @@ function AssetFormModal({
     mode === "create"
       ? "Thêm tài sản"
       : mode === "edit"
-      ? "Chỉnh sửa tài sản"
-      : "Xóa tài sản";
+        ? "Chỉnh sửa tài sản"
+        : "Xóa tài sản";
 
   return (
     <Modal open={open} title={title} onClose={onClose}>
@@ -130,7 +130,7 @@ function AssetFormModal({
 
             {accountOptions.length > 0 ? (
               <MyInputField
-                label="Người phụ trách: (*)"
+                label="Tài khoản: (*)"
                 name="AccountId"
                 as="select"
                 options={accountOptions}
@@ -139,7 +139,7 @@ function AssetFormModal({
               />
             ) : (
               <MyInputField
-                label="Người phụ trách (ID): (*)"
+                label="Tài khoản (ID): (*)"
                 name="AccountId"
                 type="number"
                 value={formData.AccountId}
@@ -215,8 +215,8 @@ function AssetFormModal({
               {submitting
                 ? "Đang lưu..."
                 : mode === "create"
-                ? "Tạo mới"
-                : "Lưu thay đổi"}
+                  ? "Tạo mới"
+                  : "Lưu thay đổi"}
             </button>
           </div>
         </form>

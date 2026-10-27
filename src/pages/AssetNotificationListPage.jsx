@@ -43,6 +43,7 @@ function AssetNotificationListPage() {
     closeModal,
     handleChange,
     handleSubmit,
+    assetOption,
   } = useAssetNotificationForm();
 
   const limit = pagination?.limit || 10;
@@ -121,6 +122,7 @@ function AssetNotificationListPage() {
           onChange={handleChange}
           onSubmit={handleSubmit}
           onClose={closeModal}
+          assetOption={assetOption}
         />
       </div>
     </div>

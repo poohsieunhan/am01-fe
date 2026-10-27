@@ -6,6 +6,8 @@ import {
   updateAssetNotification,
 } from "../../features/assetNotification/assetNotificationSlice";
 import { selectAssetNotificationPagination } from "../../features/assetNotification/assetNotificationSelectors";
+import assetApi from "../../services/assetApi";
+import { useEffect } from "react";
 
 function initialForm() {
   return {
@@ -19,7 +21,7 @@ function initialForm() {
 export function useAssetNotificationForm() {
   const dispatch = useDispatch();
   const pagination = useSelector(selectAssetNotificationPagination);
-
+  const [assetOption, setAssetOption] = useState([]);
   const [open, setOpen] = useState(false);
   const [mode, setMode] = useState("create");
   const [selectedItem, setSelectedItem] = useState(null);
@@ -34,6 +36,21 @@ export function useAssetNotificationForm() {
     setFormError("");
     setOpen(true);
   };
+
+  useEffect(() => {
+    assetApi
+      .getAll({ page: 1, limit: 100 })
+      .then((res) => {
+        const list = res?.data || [];
+        setAssetOption(
+          list.map((t) => ({
+            value: String(t.Id),
+            label: `${t.Name} (${t.Code || t.Id})`,
+          }))
+        );
+      })
+      .catch(() => { });
+  }, []);
 
   const openEdit = (item) => {
     setMode("edit");
@@ -148,5 +165,6 @@ export function useAssetNotificationForm() {
     closeModal,
     handleChange,
     handleSubmit,
+    assetOption
   };
 }

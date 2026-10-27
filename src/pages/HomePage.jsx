@@ -1,13 +1,12 @@
-// src/pages/HomePage.jsx
-//import DashboardPage from "./DashboardPage";
+import DashboardPage from "./DashboardPage";
 
-function HomePage() {
+export default function HomePage() {
   return (
-    <div>
-      <h1>Trang chủ</h1>
-      {/* <DashboardPage /> */}
+    <div className="space-y-6">
+      {/* Dashboard tài sản sắp hết hạn */}
+      <DashboardPage />
+
+      {/* Có thể nhúng thêm các dashboard/widget khác ở đây trong tương lai */}
     </div>
   );
 }
-
-export default HomePage;

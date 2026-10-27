@@ -37,8 +37,8 @@ export const assetNotificationColumns = [
   },
   {
     id: "AssetId",
-    header: "TÀI SẢN (ID)",
-    accessor: "AssetId",
+    header: "TÀI SẢN",
+    accessor: (row) => row.asset?.Name || row.AssetId || "-",
     thClassName: "whitespace-nowrap text-center",
     tdClassName: "whitespace-nowrap font-medium text-slate-800 text-center",
   },

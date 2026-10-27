@@ -12,13 +12,14 @@ function AssetNotificationFormModal({
   onChange,
   onSubmit,
   onClose,
+  assetOption = []
 }) {
   const title =
     mode === "create"
       ? "Thêm cảnh báo tài sản"
       : mode === "edit"
-      ? "Chỉnh sửa cảnh báo tài sản"
-      : "Xóa cấu hình cảnh báo";
+        ? "Chỉnh sửa cảnh báo tài sản"
+        : "Xóa cấu hình cảnh báo";
 
   return (
     <Modal open={open} title={title} onClose={onClose}>
@@ -51,14 +52,26 @@ function AssetNotificationFormModal({
       ) : (
         <form onSubmit={onSubmit} className="space-y-4 text-left">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <MyInputField
-              label="Tài sản (Asset ID): (*)"
-              name="AssetId"
-              type="number"
-              value={formData.AssetId}
-              onChange={onChange}
-              placeholder="VD: 1"
-            />
+            {assetOption?.length > 0 ? (
+              <MyInputField
+                label="Tài sản (Asset ID): (*)"
+                name="AssetId"
+                as="select"
+                options={assetOption}
+                value={formData.AssetId}
+                onChange={onChange}
+              />
+            ) : (
+              <MyInputField
+                label="Tài sản (Asset ID): (*)"
+                name="AssetId"
+                type="number"
+                value={formData.AssetId}
+                onChange={onChange}
+                placeholder="VD: 1"
+              />
+            )}
+
             <MyInputField
               label="Số ngày báo trước: (*)"
               name="NotifyBeforeDays"
@@ -106,8 +119,8 @@ function AssetNotificationFormModal({
               {submitting
                 ? "Đang lưu..."
                 : mode === "create"
-                ? "Tạo mới"
-                : "Lưu thay đổi"}
+                  ? "Tạo mới"
+                  : "Lưu thay đổi"}
             </button>
           </div>
         </form>

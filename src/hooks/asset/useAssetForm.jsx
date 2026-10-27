@@ -15,7 +15,7 @@ function initialForm() {
   return {
     Code: "",
     Name: "",
-    AssetTypeId: "1",
+    AssetTypeId: "2",
     Status: "1",
     CompanyId: "1",
     AccountId: "1",
@@ -65,7 +65,7 @@ export function useAssetForm() {
           }))
         );
       })
-      .catch(() => {});
+      .catch(() => { });
 
     companyApi
       .getAll({ page: 1, limit: 100 })
@@ -78,7 +78,7 @@ export function useAssetForm() {
           }))
         );
       })
-      .catch(() => {});
+      .catch(() => { });
 
     accountApi
       .getAll({ page: 1, limit: 100 })
@@ -87,11 +87,11 @@ export function useAssetForm() {
         setAccountOptions(
           list.map((a) => ({
             value: String(a.Id),
-            label: `${a.Name} (${a.Username})`,
+            label: `${a.Name}`,
           }))
         );
       })
-      .catch(() => {});
+      .catch(() => { });
 
     projectApi
       .getAll({ page: 1, limit: 100 })
@@ -104,7 +104,7 @@ export function useAssetForm() {
           }))
         );
       })
-      .catch(() => {});
+      .catch(() => { });
   }, []);
 
   const openCreate = () => {

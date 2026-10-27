@@ -10,6 +10,13 @@ const assetApi = {
     return res.data.metadata;
   },
 
+  async getExpiring({ days = 30, page = 1, limit = 50, type = "expiring" } = {}) {
+    const res = await api.get("/asset/expiring", {
+      params: { days, page, limit, type },
+    });
+    return res.data.metadata;
+  },
+
   async getById(id) {
     const res = await api.get(`/asset/${id}`);
     return res.data.metadata;

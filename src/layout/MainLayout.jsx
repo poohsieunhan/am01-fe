@@ -14,6 +14,7 @@ import {
   ChevronDown,
   ChevronRight,
   Settings,
+  LayoutDashboard,
 } from "lucide-react";
 
 const layoutStyle = {
@@ -104,6 +105,26 @@ function MainLayout() {
             gap: "8px",
           }}
         >
+          {/* Menu: Dashboard */}
+          <NavLink
+            to="/dashboard"
+            style={({ isActive }) => ({
+              ...(isActive || location.pathname === "/" ? activeLinkStyle : null),
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              padding: "8px",
+              borderRadius: "8px",
+              textDecoration: "none",
+              color: "inherit",
+              whiteSpace: "nowrap",
+            })}
+            title={!sidebarOpen ? "Dashboard" : undefined}
+          >
+            <LayoutDashboard size={16} />
+            {sidebarOpen && <span style={{ fontSize: "14px" }}>Dashboard</span>}
+          </NavLink>
+
           {/* Menu: Tài sản */}
           <NavLink
             to="/asset"

@@ -6,8 +6,6 @@ const axiosClient = axios.create({
   baseURL: API_BASE_URL,
 });
 
-// Có thể thêm interceptors ở đây sau này
-// axiosClient.interceptors.request.use(...)
-// axiosClient.interceptors.response.use(...)
+
 
 export default axiosClient;
