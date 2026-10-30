@@ -11,6 +11,7 @@ function initialForm() {
   return {
     Name: "",
     Username: "",
+    Email: "",
     Password: "",
   };
 }
@@ -40,6 +41,7 @@ export function useAccountForm() {
     setFormData({
       Name: account.Name || "",
       Username: account.Username || "",
+      Email: account.Email || "",
       Password: "",
     });
     setFormError("");
@@ -93,6 +95,7 @@ export function useAccountForm() {
       const payload = {
         Name: formData.Name.trim(),
         Username: formData.Username.trim(),
+        Email: formData.Email ? formData.Email.trim() : null,
       };
       if (formData.Password) {
         payload.Password = formData.Password.trim();

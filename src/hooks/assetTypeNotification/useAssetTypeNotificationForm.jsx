@@ -5,7 +5,10 @@ import {
   deleteAssetTypeNotification,
   updateAssetTypeNotification,
 } from "../../features/assetTypeNotification/assetTypeNotificationSlice";
-import { selectAssetTypeNotificationPagination } from "../../features/assetTypeNotification/assetTypeNotificationSelectors";
+import {
+  selectAssetTypeNotificationPagination,
+  selectAssetTypeNotificationSearchText,
+} from "../../features/assetTypeNotification/assetTypeNotificationSelectors";
 import assetTypeApi from "../../services/assetTypeApi";
 
 function initialForm() {
@@ -20,6 +23,7 @@ function initialForm() {
 export function useAssetTypeNotificationForm() {
   const dispatch = useDispatch();
   const pagination = useSelector(selectAssetTypeNotificationPagination);
+  const searchText = useSelector(selectAssetTypeNotificationSearchText);
 
   const [open, setOpen] = useState(false);
   const [mode, setMode] = useState("create");
@@ -112,6 +116,7 @@ export function useAssetTypeNotificationForm() {
       const refetch = {
         page: mode === "edit" ? pagination?.page || 1 : 1,
         limit: pagination?.limit || 10,
+        search: searchText,
       };
 
       const payload = {

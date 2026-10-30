@@ -3,9 +3,9 @@ import axiosClient from "./axiosClient";
 const api = axiosClient;
 
 const assetNotificationApi = {
-  async getAll({ page = 1, limit = 10 } = {}) {
+  async getAll({ page = 1, limit = 10, search = "" } = {}) {
     const res = await api.get("/assetnotification", {
-      params: { page, limit },
+      params: { page, limit, search: search || undefined },
     });
     return res.data.metadata;
   },

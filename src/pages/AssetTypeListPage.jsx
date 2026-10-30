@@ -48,15 +48,19 @@ function AssetTypeListPage() {
 
   const limit = pagination?.limit || 10;
 
+  // Tự động tìm kiếm debounce khi người dùng nhập từ khóa
   useEffect(() => {
-    dispatch(fetchAssetTypes({ page: 1, limit: 10 }));
-  }, [dispatch]);
+    const timer = setTimeout(() => {
+      dispatch(fetchAssetTypes({ page: 1, limit, search: searchText }));
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [dispatch, searchText, limit]);
 
   const handleChangePage = useCallback(
     (nextPage) => {
-      dispatch(fetchAssetTypes({ page: nextPage, limit }));
+      dispatch(fetchAssetTypes({ page: nextPage, limit, search: searchText }));
     },
-    [dispatch, limit]
+    [dispatch, limit, searchText]
   );
 
   return (

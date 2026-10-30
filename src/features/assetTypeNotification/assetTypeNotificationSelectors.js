@@ -1,5 +1,3 @@
-import { createSelector } from "@reduxjs/toolkit";
-
 export const selectAssetTypeNotificationList = (state) =>
   state.assetTypeNotification.list;
 export const selectAssetTypeNotificationPagination = (state) =>
@@ -13,23 +11,5 @@ export const selectAssetTypeNotificationError = (state) =>
 export const selectAssetTypeNotificationSearchText = (state) =>
   state.assetTypeNotification.searchText;
 
-export const selectFilteredAssetTypeNotifications = createSelector(
-  [selectAssetTypeNotificationList, selectAssetTypeNotificationSearchText],
-  (list, searchText) => {
-    if (!searchText) return list;
-
-    const keyword = searchText.toLowerCase();
-    return (list || []).filter((item) => {
-      const typeId = String(item.AssetTypeId || "");
-      const typeName = (item.assetType?.Name || "").toLowerCase();
-      const typeCode = (item.assetType?.Code || "").toLowerCase();
-      const days = String(item.NotifyBeforeDays || "");
-      return (
-        typeId.includes(keyword) ||
-        typeName.includes(keyword) ||
-        typeCode.includes(keyword) ||
-        days.includes(keyword)
-      );
-    });
-  }
-);
+export const selectFilteredAssetTypeNotifications = (state) =>
+  state.assetTypeNotification.list;

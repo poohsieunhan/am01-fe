@@ -52,15 +52,19 @@ function CompanyListPage() {
 
   const limit = pagination?.limit || 10;
 
+  // Tự động tìm kiếm debounce khi người dùng nhập từ khóa
   useEffect(() => {
-    dispatch(fetchCompanies({ page: 1, limit: 10 }));
-  }, [dispatch]);
+    const timer = setTimeout(() => {
+      dispatch(fetchCompanies({ page: 1, limit, search: searchText }));
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [dispatch, searchText, limit]);
 
   const handleChangePage = useCallback(
     (nextPage) => {
-      dispatch(fetchCompanies({ page: nextPage, limit }));
+      dispatch(fetchCompanies({ page: nextPage, limit, search: searchText }));
     },
-    [dispatch, limit],
+    [dispatch, limit, searchText]
   );
 
   // Import Excel: giữ nguyên logic toast, nhưng refresh qua Redux
@@ -77,7 +81,7 @@ function CompanyListPage() {
       }
 
       // refresh list
-      dispatch(fetchCompanies({ page: 1, limit }));
+      dispatch(fetchCompanies({ page: 1, limit, search: searchText }));
     } catch (err) {
       toast.error("Import thất bại");
       console.log("handle import excel:", err);

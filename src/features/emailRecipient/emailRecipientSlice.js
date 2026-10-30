@@ -4,9 +4,10 @@ import emailRecipientApi from "../../services/emailRecipientApi";
 
 export const fetchEmailRecipients = createAsyncThunk(
   "emailRecipient/fetchEmailRecipients",
-  async ({ page = 1, limit = 10 } = {}, { rejectWithValue }) => {
+  async ({ page = 1, limit = 10, search } = {}, { getState, rejectWithValue }) => {
     try {
-      const res = await emailRecipientApi.getAll({ page, limit });
+      const q = search !== undefined ? search : getState().emailRecipient.searchText;
+      const res = await emailRecipientApi.getAll({ page, limit, search: q });
       return {
         list: res.data || [],
         pagination: res.pagination || null,

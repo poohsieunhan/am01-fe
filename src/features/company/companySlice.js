@@ -2,12 +2,13 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import toast from "react-hot-toast";
 import companyApi from "../../services/companyApi";
 
-// GET list companies with server pagination.
+// GET list companies with server pagination
 export const fetchCompanies = createAsyncThunk(
   "company/fetchCompanies",
-  async ({ page = 1, limit = 10 } = {}, { rejectWithValue }) => {
+  async ({ page = 1, limit = 10, search } = {}, { getState, rejectWithValue }) => {
     try {
-      const res = await companyApi.getAll({ page, limit });
+      const q = search !== undefined ? search : getState().company.searchText;
+      const res = await companyApi.getAll({ page, limit, search: q });
       return {
         list: res.data || [],
         pagination: res.pagination || null,

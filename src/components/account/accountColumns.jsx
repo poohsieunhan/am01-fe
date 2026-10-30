@@ -22,6 +22,14 @@ export const accountColumns = [
     tdClassName: "whitespace-nowrap font-mono text-center text-slate-700",
   },
   {
+    id: "Email",
+    header: "EMAIL",
+    accessor: "Email",
+    thClassName: "whitespace-nowrap",
+    tdClassName: "whitespace-nowrap text-slate-600",
+    cell: (_row, value) => value || "-",
+  },
+  {
     id: "Password",
     header: "MẬT KHẨU",
     accessor: "Password",

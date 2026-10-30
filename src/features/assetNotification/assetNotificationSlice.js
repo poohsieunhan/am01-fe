@@ -4,9 +4,9 @@ import assetNotificationApi from "../../services/assetNotificationApi";
 
 export const fetchAssetNotifications = createAsyncThunk(
   "assetNotification/fetchAssetNotifications",
-  async ({ page = 1, limit = 10 } = {}, { rejectWithValue }) => {
+  async ({ page = 1, limit = 10, search = "" } = {}, { rejectWithValue }) => {
     try {
-      const res = await assetNotificationApi.getAll({ page, limit });
+      const res = await assetNotificationApi.getAll({ page, limit, search });
       return {
         list: res.data || [],
         pagination: res.pagination || null,

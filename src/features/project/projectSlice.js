@@ -4,9 +4,10 @@ import projectApi from "../../services/projectApi";
 
 export const fetchProjects = createAsyncThunk(
   "project/fetchProjects",
-  async ({ page = 1, limit = 10 } = {}, { rejectWithValue }) => {
+  async ({ page = 1, limit = 10, search } = {}, { getState, rejectWithValue }) => {
     try {
-      const res = await projectApi.getAll({ page, limit });
+      const q = search !== undefined ? search : getState().project.searchText;
+      const res = await projectApi.getAll({ page, limit, search: q });
       return {
         list: res.data || [],
         pagination: res.pagination || null,

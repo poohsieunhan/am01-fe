@@ -67,6 +67,15 @@ function AccountFormModal({
           />
 
           <MyInputField
+            label="Email:"
+            name="Email"
+            type="email"
+            value={formData.Email}
+            onChange={onChange}
+            placeholder="VD: user01@example.com"
+          />
+
+          <MyInputField
             label={
               mode === "edit"
                 ? "Mật khẩu: (để trống nếu không đổi)"

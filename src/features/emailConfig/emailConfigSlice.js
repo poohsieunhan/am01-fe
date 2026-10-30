@@ -4,9 +4,10 @@ import emailConfigApi from "../../services/emailConfigApi";
 
 export const fetchEmailConfigs = createAsyncThunk(
   "emailConfig/fetchEmailConfigs",
-  async ({ page = 1, limit = 10 } = {}, { rejectWithValue }) => {
+  async ({ page = 1, limit = 10, search } = {}, { getState, rejectWithValue }) => {
     try {
-      const res = await emailConfigApi.getAll({ page, limit });
+      const q = search !== undefined ? search : getState().emailConfig.searchText;
+      const res = await emailConfigApi.getAll({ page, limit, search: q });
       return {
         list: res.data || [],
         pagination: res.pagination || null,
@@ -67,7 +68,8 @@ export const deleteEmailConfig = createAsyncThunk(
       return true;
     } catch (err) {
       const msg =
-        err?.response?.data?.message || "Có lỗi xảy ra khi xóa cấu hình email.";
+        err?.response?.data?.message ||
+        "Có lỗi xảy ra khi xóa cấu hình email.";
       toast.error(msg);
       return rejectWithValue({ message: msg });
     }

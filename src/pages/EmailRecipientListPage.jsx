@@ -48,14 +48,17 @@ function EmailRecipientListPage() {
   const limit = pagination?.limit || 10;
 
   useEffect(() => {
-    dispatch(fetchEmailRecipients({ page: 1, limit: 10 }));
-  }, [dispatch]);
+    const timer = setTimeout(() => {
+      dispatch(fetchEmailRecipients({ page: 1, limit, search: searchText }));
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [dispatch, limit, searchText]);
 
   const handleChangePage = useCallback(
     (nextPage) => {
-      dispatch(fetchEmailRecipients({ page: nextPage, limit }));
+      dispatch(fetchEmailRecipients({ page: nextPage, limit, search: searchText }));
     },
-    [dispatch, limit]
+    [dispatch, limit, searchText]
   );
 
   return (

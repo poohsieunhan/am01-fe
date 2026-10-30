@@ -19,12 +19,14 @@ import {
   selectAssetSearchText,
 } from "../features/asset/assetSelectors";
 
+import { selectIsAdmin } from "../features/auth/authSelectors";
 import { useAssetForm } from "../hooks/asset/useAssetForm";
 
 function AssetListPage() {
   const dispatch = useDispatch();
 
   // selectors
+  const isAdmin = useSelector(selectIsAdmin);
   const filteredAssets = useSelector(selectFilteredAssets);
   const pagination = useSelector(selectAssetPagination);
   const loading = useSelector(selectAssetLoading);
@@ -52,15 +54,19 @@ function AssetListPage() {
 
   const limit = pagination?.limit || 10;
 
+  // Tự động tìm kiếm debounce khi người dùng nhập từ khóa
   useEffect(() => {
-    dispatch(fetchAssets({ page: 1, limit: 10 }));
-  }, [dispatch]);
+    const timer = setTimeout(() => {
+      dispatch(fetchAssets({ page: 1, limit, search: searchText }));
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [dispatch, searchText, limit]);
 
   const handleChangePage = useCallback(
     (nextPage) => {
-      dispatch(fetchAssets({ page: nextPage, limit }));
+      dispatch(fetchAssets({ page: nextPage, limit, search: searchText }));
     },
-    [dispatch, limit]
+    [dispatch, limit, searchText]
   );
 
   return (
@@ -69,7 +75,7 @@ function AssetListPage() {
         <AssetToolbar
           searchText={searchText}
           setSearchText={(val) => dispatch(setAssetSearchText(val))}
-          onAdd={openCreate}
+          onAdd={isAdmin ? openCreate : undefined}
         />
 
         <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
@@ -91,44 +97,50 @@ function AssetListPage() {
               data={filteredAssets}
               pagination={pagination}
               onChangePage={handleChangePage}
-              actionsHeader="THAO TÁC"
-              renderActions={(asset) => (
-                <div className="flex items-center justify-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => openEdit(asset)}
-                    className="px-3 py-1 text-xs font-medium rounded bg-blue-500 text-white hover:bg-blue-600"
-                  >
-                    Sửa
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => openDelete(asset)}
-                    className="px-3 py-1 text-xs font-medium rounded bg-red-500 text-white hover:bg-red-600"
-                  >
-                    Xóa
-                  </button>
-                </div>
-              )}
+              actionsHeader={isAdmin ? "THAO TÁC" : undefined}
+              renderActions={
+                isAdmin
+                  ? (asset) => (
+                      <div className="flex items-center justify-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => openEdit(asset)}
+                          className="px-3 py-1 text-xs font-medium rounded bg-blue-500 text-white hover:bg-blue-600 cursor-pointer"
+                        >
+                          Sửa
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => openDelete(asset)}
+                          className="px-3 py-1 text-xs font-medium rounded bg-red-500 text-white hover:bg-red-600 cursor-pointer"
+                        >
+                          Xóa
+                        </button>
+                      </div>
+                    )
+                  : undefined
+              }
             />
           )}
         </div>
 
-        <AssetFormModal
-          open={open}
-          mode={mode}
-          formData={formData}
-          formError={formError}
-          submitting={submitting}
-          selectedAsset={selectedAsset}
-          assetTypeOptions={assetTypeOptions}
-          companyOptions={companyOptions}
-          accountOptions={accountOptions}
-          projectOptions={projectOptions}
-          onChange={handleChange}
-          onSubmit={handleSubmit}
-          onClose={closeModal}
-        />
+        {isAdmin && (
+          <AssetFormModal
+            open={open}
+            mode={mode}
+            formData={formData}
+            formError={formError}
+            submitting={submitting}
+            selectedAsset={selectedAsset}
+            assetTypeOptions={assetTypeOptions}
+            companyOptions={companyOptions}
+            accountOptions={accountOptions}
+            projectOptions={projectOptions}
+            onChange={handleChange}
+            onSubmit={handleSubmit}
+            onClose={closeModal}
+          />
+        )}
       </div>
     </div>
   );

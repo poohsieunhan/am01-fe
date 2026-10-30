@@ -8,9 +8,12 @@ import emailConfigReducer from "../features/emailConfig/emailConfigSlice";
 import emailRecipientReducer from "../features/emailRecipient/emailRecipientSlice";
 import assetTypeNotificationReducer from "../features/assetTypeNotification/assetTypeNotificationSlice";
 import assetNotificationReducer from "../features/assetNotification/assetNotificationSlice";
+import userReducer from "../features/user/userSlice";
+import authReducer from "../features/auth/authSlice";
 
 export const store = configureStore({
   reducer: {
+    auth: authReducer,
     company: companyReducer,
     asset: assetReducer,
     assetType: assetTypeReducer,
@@ -20,6 +23,7 @@ export const store = configureStore({
     emailRecipient: emailRecipientReducer,
     assetTypeNotification: assetTypeNotificationReducer,
     assetNotification: assetNotificationReducer,
+    user: userReducer,
   },
 });
 

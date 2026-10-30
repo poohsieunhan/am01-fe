@@ -4,9 +4,10 @@ import accountApi from "../../services/accountApi";
 
 export const fetchAccounts = createAsyncThunk(
   "account/fetchAccounts",
-  async ({ page = 1, limit = 10 } = {}, { rejectWithValue }) => {
+  async ({ page = 1, limit = 10, search } = {}, { getState, rejectWithValue }) => {
     try {
-      const res = await accountApi.getAll({ page, limit });
+      const q = search !== undefined ? search : getState().account.searchText;
+      const res = await accountApi.getAll({ page, limit, search: q });
       return {
         list: res.data || [],
         pagination: res.pagination || null,

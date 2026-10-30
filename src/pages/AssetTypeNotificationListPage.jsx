@@ -49,14 +49,17 @@ function AssetTypeNotificationListPage() {
   const limit = pagination?.limit || 10;
 
   useEffect(() => {
-    dispatch(fetchAssetTypeNotifications({ page: 1, limit: 10 }));
-  }, [dispatch]);
+    const timer = setTimeout(() => {
+      dispatch(fetchAssetTypeNotifications({ page: 1, limit, search: searchText }));
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [dispatch, limit, searchText]);
 
   const handleChangePage = useCallback(
     (nextPage) => {
-      dispatch(fetchAssetTypeNotifications({ page: nextPage, limit }));
+      dispatch(fetchAssetTypeNotifications({ page: nextPage, limit, search: searchText }));
     },
-    [dispatch, limit]
+    [dispatch, limit, searchText]
   );
 
   return (

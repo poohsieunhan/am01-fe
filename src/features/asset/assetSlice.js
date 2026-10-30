@@ -5,9 +5,10 @@ import assetApi from "../../services/assetApi";
 // GET list assets with server pagination
 export const fetchAssets = createAsyncThunk(
   "asset/fetchAssets",
-  async ({ page = 1, limit = 10 } = {}, { rejectWithValue }) => {
+  async ({ page = 1, limit = 10, search } = {}, { getState, rejectWithValue }) => {
     try {
-      const res = await assetApi.getAll({ page, limit });
+      const q = search !== undefined ? search : getState().asset.searchText;
+      const res = await assetApi.getAll({ page, limit, search: q });
       return {
         list: res.data || [],
         pagination: res.pagination || null,

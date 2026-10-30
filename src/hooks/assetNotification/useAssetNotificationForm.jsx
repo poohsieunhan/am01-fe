@@ -5,7 +5,10 @@ import {
   deleteAssetNotification,
   updateAssetNotification,
 } from "../../features/assetNotification/assetNotificationSlice";
-import { selectAssetNotificationPagination } from "../../features/assetNotification/assetNotificationSelectors";
+import {
+  selectAssetNotificationPagination,
+  selectAssetNotificationSearchText,
+} from "../../features/assetNotification/assetNotificationSelectors";
 import assetApi from "../../services/assetApi";
 import { useEffect } from "react";
 
@@ -21,6 +24,7 @@ function initialForm() {
 export function useAssetNotificationForm() {
   const dispatch = useDispatch();
   const pagination = useSelector(selectAssetNotificationPagination);
+  const searchText = useSelector(selectAssetNotificationSearchText);
   const [assetOption, setAssetOption] = useState([]);
   const [open, setOpen] = useState(false);
   const [mode, setMode] = useState("create");
@@ -107,6 +111,7 @@ export function useAssetNotificationForm() {
       const refetch = {
         page: mode === "edit" ? pagination?.page || 1 : 1,
         limit: pagination?.limit || 10,
+        search: searchText,
       };
 
       const payload = {

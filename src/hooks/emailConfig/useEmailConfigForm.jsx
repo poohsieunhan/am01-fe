@@ -102,14 +102,6 @@ export function useEmailConfigForm() {
           setFormError("Cấu hình Secure là bắt buộc.");
           return;
         }
-        if (!formData.Username.trim()) {
-          setFormError("Tài khoản SMTP là bắt buộc.");
-          return;
-        }
-        if (!formData.Password.trim()) {
-          setFormError("Mật khẩu SMTP là bắt buộc.");
-          return;
-        }
         if (!formData.FromEmail.trim()) {
           setFormError("Email gửi là bắt buộc.");
           return;

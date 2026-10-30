@@ -12,7 +12,12 @@ import {
   User,
   ArrowRight,
   ShieldAlert,
+  FileSpreadsheet,
+  Mail,
+  Loader2,
 } from "lucide-react";
+import toast from "react-hot-toast";
+import * as XLSX from "xlsx";
 import assetApi from "../services/assetApi";
 import { renderAssetTypeBadge } from "../components/asset/assetColumns";
 
@@ -21,6 +26,7 @@ export default function DashboardPage() {
   const [customDays, setCustomDays] = useState("");
   const [activeTab, setActiveTab] = useState("expiring"); // "expiring" | "expired" | "all_warning"
   const [loading, setLoading] = useState(true);
+  const [sendingMail, setSendingMail] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
 
   const [summary, setSummary] = useState({
@@ -32,13 +38,14 @@ export default function DashboardPage() {
   const [assets, setAssets] = useState([]);
 
   // Fetch dữ liệu từ API
-  const fetchData = async (selectedDays = days, type = activeTab) => {
+  const fetchData = async (selectedDays = days, type = activeTab, search = searchTerm) => {
     try {
       setLoading(true);
       const res = await assetApi.getExpiring({
         days: selectedDays,
         type: type,
         limit: 100,
+        search: search || undefined,
       });
 
       if (res) {
@@ -60,8 +67,11 @@ export default function DashboardPage() {
   };
 
   useEffect(() => {
-    fetchData(days, activeTab);
-  }, [days, activeTab]);
+    const timer = setTimeout(() => {
+      fetchData(days, activeTab, searchTerm);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [days, activeTab, searchTerm]);
 
   const handleSelectDays = (val) => {
     setDays(val);
@@ -147,6 +157,111 @@ export default function DashboardPage() {
     0,
     summary.totalAssets - summary.expiredCount - summary.expiringCount
   );
+
+  // Gửi email thông báo tài sản hết hạn / sắp hết hạn theo mẫu cronjob của BE
+  const handleSendNotificationMail = async () => {
+    let typeText = "sắp hết hạn";
+    let count = summary.expiringCount;
+    if (activeTab === "expired") {
+      typeText = "đã quá hạn";
+      count = summary.expiredCount;
+    } else if (activeTab === "all_warning") {
+      typeText = "quá hạn và sắp hết hạn";
+      count = summary.expiredCount + summary.expiringCount;
+    }
+
+    if (count === 0) {
+      toast.error(`Không có tài sản nào ${typeText} (trạng thái đang sử dụng) để gửi email.`);
+      return;
+    }
+
+    const confirmMessage = `Bạn có chắc chắn muốn gửi email thông báo cho ${count} tài sản ${typeText} (trạng thái đang sử dụng)?`;
+    if (!window.confirm(confirmMessage)) return;
+
+    try {
+      setSendingMail(true);
+      const res = await assetApi.sendNotificationMail({
+        type: activeTab,
+        days: days,
+      });
+
+      const msg =
+        res?.metadata?.message ||
+        res?.message ||
+        `Đã gửi email cảnh báo tài sản ${typeText} thành công!`;
+      toast.success(msg, { duration: 5000 });
+    } catch (err) {
+      console.error("Lỗi khi gửi email thông báo:", err);
+      const msg =
+        err?.response?.data?.message ||
+        err?.message ||
+        "Gặp lỗi khi gửi email thông báo. Vui lòng kiểm tra cấu hình Email.";
+      toast.error(msg, { duration: 5000 });
+    } finally {
+      setSendingMail(false);
+    }
+  };
+
+  // Xuất file Excel danh sách tài sản hiển thị trên grid
+  const handleExportExcel = () => {
+    if (!filteredAssets || filteredAssets.length === 0) {
+      toast.error("Không có dữ liệu trong danh sách để xuất Excel!");
+      return;
+    }
+
+    try {
+      const rows = filteredAssets.map((asset, idx) => {
+        const status = getExpiryStatus(asset.ExpireDate);
+        return {
+          STT: idx + 1,
+          "Mã tài sản": asset.Code || "",
+          "Tên tài sản": asset.Name || "",
+          "Loại tài sản": asset.assetTypeId?.Name || "",
+          "Công ty": asset.company?.TenCongTy || "",
+          "Dự án": asset.project?.Name || "",
+          "Tài khoản": asset.account?.Name || "",
+          "Ngày hết hạn": asset.ExpireDate
+            ? new Date(asset.ExpireDate).toLocaleDateString("vi-VN")
+            : "Không xác định",
+          "Tình trạng": status.text || "",
+        };
+      });
+
+      const worksheet = XLSX.utils.json_to_sheet(rows);
+
+      // Định dạng độ rộng cột
+      worksheet["!cols"] = [
+        { wch: 6 },  // STT
+        { wch: 15 }, // Mã tài sản
+        { wch: 32 }, // Tên tài sản
+        { wch: 20 }, // Loại tài sản
+        { wch: 30 }, // Công ty
+        { wch: 25 }, // Dự án
+        { wch: 20 }, // Tài khoản
+        { wch: 16 }, // Ngày hết hạn
+        { wch: 22 }, // Tình trạng
+      ];
+
+      const workbook = XLSX.utils.book_new();
+      const sheetName =
+        activeTab === "expiring"
+          ? "SapHetHan"
+          : activeTab === "expired"
+          ? "DaHetHan"
+          : "CanXuLy";
+      XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
+
+      const now = new Date();
+      const dateStr = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, "0")}${String(now.getDate()).padStart(2, "0")}`;
+      const filename = `Danh_sach_tai_san_${sheetName}_${dateStr}.xlsx`;
+
+      XLSX.writeFile(workbook, filename);
+      toast.success(`Đã xuất ${filteredAssets.length} tài sản ra file Excel!`);
+    } catch (error) {
+      console.error("Lỗi khi xuất file Excel:", error);
+      toast.error("Có lỗi xảy ra khi tạo file Excel!");
+    }
+  };
 
   return (
     <div className="max-w-7xl mx-auto space-y-6 pb-12">
@@ -360,19 +475,72 @@ export default function DashboardPage() {
             </button>
           </div>
 
-          {/* Ô tìm kiếm nhanh */}
-          <div className="relative w-full md:w-72">
-            <Search
-              size={15}
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
-            />
-            <input
-              type="text"
-              placeholder="Tìm theo tên, mã, loại tài sản..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-9 pr-3 py-1.5 text-xs bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500"
-            />
+          {/* Ô tìm kiếm nhanh, Gửi mail & Nút xuất Excel */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+            <div className="relative w-full sm:w-64">
+              <Search
+                size={15}
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+              />
+              <input
+                type="text"
+                placeholder="Tìm theo tên, mã, loại tài sản..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-9 pr-3 py-1.5 text-xs bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500"
+              />
+            </div>
+
+            {/* Nút gửi mail cảnh báo - hỗ trợ cả 3 tab: expiring, expired, all_warning */}
+            <button
+              type="button"
+              onClick={handleSendNotificationMail}
+              disabled={sendingMail || filteredAssets.length === 0}
+              className={`inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg text-white shadow-sm transition whitespace-nowrap cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${
+                activeTab === "expired"
+                  ? "bg-rose-600 hover:bg-rose-700 active:bg-rose-800"
+                  : activeTab === "all_warning"
+                  ? "bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800"
+                  : "bg-amber-600 hover:bg-amber-700 active:bg-amber-800"
+              }`}
+              title={`Gửi email thông báo danh sách tài sản ${
+                activeTab === "expired"
+                  ? "đã hết hạn"
+                  : activeTab === "all_warning"
+                  ? "quá hạn và sắp hết hạn"
+                  : "sắp hết hạn"
+              } (trạng thái đang sử dụng)`}
+            >
+              {sendingMail ? (
+                <>
+                  <Loader2 size={14} className="animate-spin" />
+                  <span>Đang gửi mail...</span>
+                </>
+              ) : (
+                <>
+                  <Mail size={14} />
+                  <span>
+                    {activeTab === "expired"
+                      ? "Gửi mail Đã hết hạn"
+                      : activeTab === "all_warning"
+                      ? "Gửi mail Quá hạn & Sắp hết hạn"
+                      : "Gửi mail Sắp hết hạn"}
+                  </span>
+                </>
+              )}
+            </button>
+
+            {/* Nút Xuất Excel */}
+            <button
+              type="button"
+              onClick={handleExportExcel}
+              disabled={filteredAssets.length === 0}
+              className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm transition whitespace-nowrap cursor-pointer"
+              title="Xuất danh sách hiện tại ra file Excel"
+            >
+              <FileSpreadsheet size={14} />
+              <span>Xuất Excel</span>
+            </button>
           </div>
         </div>
 
